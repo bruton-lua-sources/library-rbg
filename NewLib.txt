@@ -1114,7 +1114,7 @@ end)
     end
   end
   
-  local ContainerList = {}
+local ContainerList = {}
 function Window:MakeTab(paste, Configs)
 	if type(paste) == "table" then Configs = paste end
 	local TName = Configs[1] or Configs.Title or "Tab!"
@@ -1149,8 +1149,19 @@ function Window:MakeTab(paste, Configs)
 		AnchorPoint = Vector2.new(0, 0.5),
 		Image = TIcon or "",
 		BackgroundTransparency = 1,
-		ImageTransparency = (FirstTab and 0.3) or 0
+		ImageTransparency = (FirstTab and 0.3) or 0,
+		ImageColor3 = Color3.new(1,1,1)
 	}), "Text")
+
+	local Glow = Instance.new("ImageLabel")
+	Glow.Parent = LabelIcon
+	Glow.Size = UDim2.new(2.2,0,2.2,0)
+	Glow.Position = UDim2.new(-0.6,0,-0.6,0)
+	Glow.BackgroundTransparency = 1
+	Glow.Image = "rbxassetid://5028857084"
+	Glow.ImageColor3 = Color3.fromRGB(180,0,255)
+	Glow.ImageTransparency = 1
+	Glow.ZIndex = LabelIcon.ZIndex - 1
 
 	local Selected = InsertTheme(Create("Frame", TabSelect, {
 		Size = FirstTab and UDim2.new(0, 4, 0, 4) or UDim2.new(0, 4, 0, 13),
@@ -1194,18 +1205,20 @@ function Window:MakeTab(paste, Configs)
 	local SwitchIcon = "rbxassetid://10723346871"
 	local IconBusy = false
 
-	local function TweenIcon(img)
-		CreateTween({LabelIcon, "ImageTransparency", 1, 0.2})
-		task.delay(0.2, function()
-			LabelIcon.Image = img or ""
-			CreateTween({LabelIcon, "ImageTransparency", 0, 0.2})
+	local function IconEffect(img)
+		LabelIcon.Image = img or ""
+		CreateTween({Glow,"ImageTransparency",0.15,0.25})
+		CreateTween({LabelIcon,"Size",UDim2.new(0,16,0,16),0.25})
+		task.delay(0.25,function()
+			CreateTween({Glow,"ImageTransparency",1,0.35})
+			CreateTween({LabelIcon,"Size",UDim2.new(0,13,0,13),0.35})
 		end)
 	end
 
 	local function Tabs()
 		if Container.Parent then return end
 
-		for _, Frame in pairs(ContainerList) do
+		for _,Frame in pairs(ContainerList) do
 			if Frame:IsA("ScrollingFrame") and Frame ~= Container then
 				Frame.Parent = nil
 			end
@@ -1222,45 +1235,45 @@ function Window:MakeTab(paste, Configs)
 
 		if not IconBusy then
 			IconBusy = true
-			TweenIcon(OpenIcon)
-			task.delay(3, function()
-				TweenIcon(OriginalIcon)
+			IconEffect(OpenIcon)
+			task.delay(2,function()
+				IconEffect(OriginalIcon)
 				IconBusy = false
 			end)
 		end
 
-		CreateTween({Container, "Size", UDim2.new(1, 0, 1, 0), 0.3})
-		CreateTween({LabelTitle, "TextTransparency", 0, 0.35})
-		CreateTween({LabelIcon, "ImageTransparency", 0, 0.35})
-		CreateTween({Selected, "Size", UDim2.new(0, 4, 0, 13), 0.35})
-		CreateTween({Selected, "BackgroundTransparency", 0, 0.35})
+		CreateTween({Container,"Size",UDim2.new(1,0,1,0),0.3})
+		CreateTween({LabelTitle,"TextTransparency",0,0.35})
+		CreateTween({LabelIcon,"ImageTransparency",0,0.35})
+		CreateTween({Selected,"Size",UDim2.new(0,4,0,13),0.35})
+		CreateTween({Selected,"BackgroundTransparency",0,0.35})
 	end
 
 	TabSelect.Activated:Connect(Tabs)
 
 	FirstTab = true
 	local Tab = {}
-	table.insert(redzlib.Tabs, {TabInfo = {Name = TName, Icon = TIcon}, func = Tab, Cont = Container})
+	table.insert(redzlib.Tabs,{TabInfo={Name=TName,Icon=TIcon},func=Tab,Cont=Container})
 	Tab.Cont = Container
 
 	function Tab:Disable()
 		Container.Parent = nil
-		TweenIcon(SwitchIcon)
-		task.delay(3, function()
-			TweenIcon(OriginalIcon)
+		IconEffect(SwitchIcon)
+		task.delay(2,function()
+			IconEffect(OriginalIcon)
 		end)
-		CreateTween({LabelTitle, "TextTransparency", 0.3, 0.35})
-		CreateTween({LabelIcon, "ImageTransparency", 0.3, 0.35})
-		CreateTween({Selected, "Size", UDim2.new(0, 4, 0, 4), 0.35})
-		CreateTween({Selected, "BackgroundTransparency", 1, 0.35})
+		CreateTween({LabelTitle,"TextTransparency",0.3,0.35})
+		CreateTween({LabelIcon,"ImageTransparency",0.3,0.35})
+		CreateTween({Selected,"Size",UDim2.new(0,4,0,4),0.35})
+		CreateTween({Selected,"BackgroundTransparency",1,0.35})
 	end
 
 	function Tab:Enable()
 		Tabs()
 	end
 	function Tab:Visible(Bool)
-		Funcs:ToggleVisible(TabSelect, Bool)
-		Funcs:ToggleParent(Container, Bool, Containers)
+		Funcs:ToggleVisible(TabSelect,Bool)
+		Funcs:ToggleParent(Container,Bool,Containers)
 	end
 	function Tab:Destroy()
 		TabSelect:Destroy()
