@@ -4,6 +4,7 @@
 
 	Created by Redz
 	Modified for Laelmano24&bruton
+	Thanks Laelmano24 It made things much easier 
   
 ]]
 
@@ -643,7 +644,7 @@ end
 
 function redzlib:MakeWindow(Configs)
   local WTitle = Configs[1] or Configs.Name or Configs.Title or "rael hub with redz library"
-  local WMiniText = Configs[2] or Configs.SubTitle or "by : Laelmano24"
+  local WMiniText = Configs[2] or Configs.SubTitle or "by : Laelmano24&bruton"
   
   Settings.ScriptFile = Configs[3] or Configs.SaveFolder or false
 
@@ -1105,20 +1106,36 @@ end)
   end
   
 local ContainerList = {}
+local ContainerList = {}
 function Window:MakeTab(paste, Configs)
 	if type(paste) == "table" then Configs = paste end
 	local TName = Configs[1] or Configs.Title or "Tab!"
 	local TIcon = Configs[2] or Configs.Icon or ""
 
 	TIcon = redzlib:GetIcon(TIcon)
-	if not TIcon:find("rbxassetid://") or TIcon:gsub("rbxassetid://", ""):len() < 6 then
+	if not TIcon:find("rbxassetid://") or TIcon:gsub("rbxassetid://",""):len() < 6 then
 		TIcon = false
 	end
 
 	local TabSelect = Make("Button", MainScroll, {
-		Size = UDim2.new(1, 0, 0, 24)
+		Size = UDim2.new(1,0,0,24)
 	})
 	Make("Corner", TabSelect)
+
+	local TabStroke = Instance.new("UIStroke")
+	TabStroke.Thickness = 1.6
+	TabStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	TabStroke.Color = Color3.new(1,1,1)
+	TabStroke.Parent = TabSelect
+
+	local TabGradient = Instance.new("UIGradient")
+	TabGradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(180,0,255)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(120,0,255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,0))
+	}
+	TabGradient.Rotation = 0
+	TabGradient.Parent = TabStroke
 
 	local LabelTitle = InsertTheme(Create("TextLabel", TabSelect, {
 		Size = UDim2.new(1, TIcon and -25 or -15, 1),
@@ -1134,13 +1151,12 @@ function Window:MakeTab(paste, Configs)
 	}), "Text")
 
 	local LabelIcon = InsertTheme(Create("ImageLabel", TabSelect, {
-		Position = UDim2.new(0, 8, 0.5),
-		Size = UDim2.new(0, 13, 0, 13),
-		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0,8,0.5),
+		Size = UDim2.new(0,13,0,13),
+		AnchorPoint = Vector2.new(0,0.5),
 		Image = TIcon or "",
 		BackgroundTransparency = 1,
-		ImageTransparency = (FirstTab and 0.3) or 0,
-		ImageColor3 = Color3.new(1,1,1)
+		ImageTransparency = (FirstTab and 0.3) or 0
 	}), "Text")
 
 	local Glow = Instance.new("ImageLabel")
@@ -1154,18 +1170,18 @@ function Window:MakeTab(paste, Configs)
 	Glow.ZIndex = LabelIcon.ZIndex - 1
 
 	local Selected = InsertTheme(Create("Frame", TabSelect, {
-		Size = FirstTab and UDim2.new(0, 4, 0, 4) or UDim2.new(0, 4, 0, 13),
-		Position = UDim2.new(0, 1, 0.5),
-		AnchorPoint = Vector2.new(0, 0.5),
+		Size = FirstTab and UDim2.new(0,4,0,4) or UDim2.new(0,4,0,13),
+		Position = UDim2.new(0,1,0.5),
+		AnchorPoint = Vector2.new(0,0.5),
 		BackgroundColor3 = Theme["Color Theme"],
 		BackgroundTransparency = FirstTab and 1 or 0
 	}), "Theme")
-	Make("Corner", Selected, UDim.new(0.5, 0))
+	Make("Corner", Selected, UDim.new(0.5,0))
 
 	local Container = InsertTheme(Create("ScrollingFrame", {
-		Size = UDim2.new(1, 0, 1, 0),
-		Position = UDim2.new(0, 0, 1),
-		AnchorPoint = Vector2.new(0, 1),
+		Size = UDim2.new(1,0,1,0),
+		Position = UDim2.new(0,0,1),
+		AnchorPoint = Vector2.new(0,1),
 		ScrollBarThickness = 1.5,
 		BackgroundTransparency = 1,
 		ScrollBarImageTransparency = 0.2,
@@ -1174,18 +1190,16 @@ function Window:MakeTab(paste, Configs)
 		ScrollingDirection = "Y",
 		BorderSizePixel = 0,
 		CanvasSize = UDim2.new(),
-		Name = ("Container %i [ %s ]"):format(#ContainerList + 1, TName)
-	}, {
-		Create("UIPadding", {
-			PaddingLeft = UDim.new(0, 10),
-			PaddingRight = UDim.new(0, 10),
-			PaddingTop = UDim.new(0, 10),
-			PaddingBottom = UDim.new(0, 10)
+		Name = ("Container %i [ %s ]"):format(#ContainerList+1, TName)
+	},{
+		Create("UIPadding",{
+			PaddingLeft = UDim.new(0,10),
+			PaddingRight = UDim.new(0,10),
+			PaddingTop = UDim.new(0,10),
+			PaddingBottom = UDim.new(0,10)
 		}),
-		Create("UIListLayout", {
-			Padding = UDim.new(0, 5)
-		})
-	}), "ScrollBar")
+		Create("UIListLayout",{Padding = UDim.new(0,5)})
+	}),"ScrollBar")
 
 	table.insert(ContainerList, Container)
 	if not FirstTab then Container.Parent = Containers end
@@ -1207,22 +1221,18 @@ function Window:MakeTab(paste, Configs)
 
 	local function Tabs()
 		if Container.Parent then return end
-
 		for _,Frame in pairs(ContainerList) do
 			if Frame:IsA("ScrollingFrame") and Frame ~= Container then
 				Frame.Parent = nil
 			end
 		end
-
 		Container.Parent = Containers
-		Container.Size = UDim2.new(1, 0, 1, 150)
-
-		table.foreach(redzlib.Tabs, function(_, Tab)
+		Container.Size = UDim2.new(1,0,1,150)
+		table.foreach(redzlib.Tabs,function(_,Tab)
 			if Tab.Cont ~= Container then
 				Tab.func:Disable()
 			end
 		end)
-
 		if not IconBusy then
 			IconBusy = true
 			IconEffect(OpenIcon)
@@ -1231,7 +1241,6 @@ function Window:MakeTab(paste, Configs)
 				IconBusy = false
 			end)
 		end
-
 		CreateTween({Container,"Size",UDim2.new(1,0,1,0),0.3})
 		CreateTween({LabelTitle,"TextTransparency",0,0.35})
 		CreateTween({LabelIcon,"ImageTransparency",0,0.35})
@@ -1258,9 +1267,7 @@ function Window:MakeTab(paste, Configs)
 		CreateTween({Selected,"BackgroundTransparency",1,0.35})
 	end
 
-	function Tab:Enable()
-		Tabs()
-	end
+	function Tab:Enable() Tabs() end
 	function Tab:Visible(Bool)
 		Funcs:ToggleVisible(TabSelect,Bool)
 		Funcs:ToggleParent(Container,Bool,Containers)
@@ -1269,6 +1276,12 @@ function Window:MakeTab(paste, Configs)
 		TabSelect:Destroy()
 		Container:Destroy()
 	end
+
+	local RunService = game:GetService("RunService")
+	RunService.Heartbeat:Connect(function(dt)
+		TabGradient.Rotation = (TabGradient.Rotation + 80 * dt) % 360
+	end)
+end
     function Tab:AddSection(Configs)
 	local SectionName = type(Configs) == "string" and Configs or Configs[1] or Configs.Name or Configs.Title or Configs.Section
 	local SectionIcon = Configs.Icon or ""
