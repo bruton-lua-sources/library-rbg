@@ -1106,7 +1106,6 @@ end)
   end
   
 local ContainerList = {}
-local ContainerList = {}
 function Window:MakeTab(paste, Configs)
 	if type(paste) == "table" then Configs = paste end
 	local TName = Configs[1] or Configs.Title or "Tab!"
@@ -1281,7 +1280,6 @@ function Window:MakeTab(paste, Configs)
 	RunService.Heartbeat:Connect(function(dt)
 		TabGradient.Rotation = (TabGradient.Rotation + 80 * dt) % 360
 	end)
-end
     function Tab:AddSection(Configs)
 	local SectionName = type(Configs) == "string" and Configs or Configs[1] or Configs.Name or Configs.Title or Configs.Section
 	local SectionIcon = Configs.Icon or ""
