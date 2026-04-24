@@ -1136,18 +1136,9 @@ end)
 	local Window, FirstTab = {}, false
 	
 	function Window:CloseBtn()
-		local Dialog = Window:Dialog({
-			Title = "Close",
-			Text = "Are you sure you want to close the script?",
-			Options = {
-				{"Confirm", function()
-					ScreenGui:Destroy()
-				end},
-				{"Cancel"}
-			}
-		})
-	end
-	
+    ScreenGui:Destroy()
+end
+
 	function Window:MinimizeBtn()
 		if WaitClick then return end
 		WaitClick = true
