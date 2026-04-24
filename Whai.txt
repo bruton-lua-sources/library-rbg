@@ -639,114 +639,135 @@ local NotificationContainer = Create("Frame", ScreenGui, {
 		VerticalAlignment = "Bottom"
 	})
 })
-local NotificationContainer = Instance.new("Frame", SupportGui)
-NotificationContainer.Size = UDim2.new(0, 180, 1, 0)
-NotificationContainer.Position = UDim2.new(1, -190, 0, 0)
-NotificationContainer.BackgroundTransparency = 1
-local UIListLayout = Instance.new("UIListLayout", NotificationContainer)
-UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 10)
+local NotificationContainer = CoreGui:FindFirstChild("MolynNotifications")
+if not NotificationContainer then
+    NotificationContainer = Instance.new("ScreenGui", CoreGui)
+    NotificationContainer.Name = "MolynNotifications"
+    NotificationContainer.DisplayOrder = 999
+    
+    local Holder = Instance.new("Frame", NotificationContainer)
+    Holder.Name = "Holder"
+    Holder.Size = UDim2.new(0, 180, 1, 0)
+    Holder.Position = UDim2.new(1, -190, 0, 0)
+    Holder.BackgroundTransparency = 1
+    
+    local UIListLayout = Instance.new("UIListLayout", Holder)
+    UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    UIListLayout.Padding = UDim.new(0, 10)
+end
+
 function redzlib:Notify(Configs)
-	local TitleText = Configs[1] or Configs.Title or "Molyn Hub"
-	local DescText = Configs[2] or Configs.Description or Configs.Text or "Molyn notifications"
-	local Duration = Configs[3] or Configs.Duration or 60
-	local imageUrl = "https://github.com/bruton-dev/Molyn/raw/refs/heads/main/MolynPNJ.jpg"
-	local folder = "molyn_&&&$$##"
-	local assetFolder = folder.."/Assets"
-	if not isfolder(folder) then makefolder(folder) end
-	if not isfolder(assetFolder) then makefolder(assetFolder) end
-	local function SanitizeFilename(b)
-		b = b:gsub("[%s/\\:*?\"<>|]+", "-")
-		b = b:gsub("[^%w%-_%.]", "")
-		return b
-	end
-	local fileName = assetFolder .. "/." .. SanitizeFilename(imageUrl) .. ".jpg"
-	local MainFrame = Instance.new("Frame", NotificationContainer)
-	MainFrame.Name = "MainFrame"
-	MainFrame.Size = UDim2.new(0, 180, 0, 55)
-	MainFrame.BackgroundColor3 = Color3.fromRGB(15, 5, 5)
-	MainFrame.BorderSizePixel = 0
-	MainFrame.ZIndex = 1
-	MainFrame.LayoutOrder = #NotificationContainer:GetChildren()
-	local RotatingImage = Instance.new("ImageLabel", MainFrame)
-	RotatingImage.Name = "RotatingImage"
-	RotatingImage.Size = UDim2.new(1, 0, 1, 0)
-	RotatingImage.BackgroundTransparency = 1
-	RotatingImage.ImageTransparency = 0.8
-	RotatingImage.ZIndex = 0
-	Instance.new("UICorner", RotatingImage).CornerRadius = UDim.new(0, 6)
-	local MainCorner = Instance.new("UICorner", MainFrame)
-	MainCorner.CornerRadius = UDim.new(0, 6)
-	local MainStroke = Instance.new("UIStroke", MainFrame)
-	MainStroke.Thickness = 1.2
-	MainStroke.Color = Color3.fromRGB(200, 0, 0)
-	MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	local Content = Instance.new("Frame", MainFrame)
-	Content.Size = UDim2.new(1, -12, 1, -10)
-	Content.Position = UDim2.new(0, 6, 0, 4)
-	Content.BackgroundTransparency = 1
-	Content.ZIndex = 2
-	local Title = Instance.new("TextLabel", Content)
-	Title.Size = UDim2.new(1, 0, 0, 18)
-	Title.BackgroundTransparency = 1
-	Title.Text = TitleText
-	Title.TextColor3 = Color3.fromRGB(255, 0, 0)
-	Title.TextSize = 13
-	Title.Font = Enum.Font.GothamBold
-	Title.TextXAlignment = Enum.TextXAlignment.Left
-	Title.ZIndex = 3
-	local Description = Instance.new("TextLabel", Content)
-	Description.Size = UDim2.new(1, 0, 0, 22)
-	Description.Position = UDim2.new(0, 0, 0, 18)
-	Description.BackgroundTransparency = 1
-	Description.Text = DescText
-	Description.TextColor3 = Color3.fromRGB(200, 200, 200)
-	Description.TextSize = 11
-	Description.Font = Enum.Font.GothamMedium
-	Description.TextXAlignment = Enum.TextXAlignment.Left
-	Description.ZIndex = 3
-	local BarBack = Instance.new("Frame", MainFrame)
-	BarBack.Size = UDim2.new(1, 0, 0, 4)
-	BarBack.Position = UDim2.new(0, 0, 1, -4)
-	BarBack.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
-	BarBack.BorderSizePixel = 0
-	BarBack.ZIndex = 4
-	local BarFill = Instance.new("Frame", BarBack)
-	BarFill.Size = UDim2.new(1, 0, 1, 0)
-	BarFill.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	BarFill.BorderSizePixel = 0
-	BarFill.ZIndex = 5
-	task.spawn(function()
-		if not isfile(fileName) then
-			local req = (syn and syn.request) or (http and http.request) or http_request or request
-			if req then
-				local response = req({Url = imageUrl, Method = "GET"})
-				if response.Success then writefile(fileName, response.Body) end
-			else
-				writefile(fileName, game:HttpGet(imageUrl))
-			end
-		end
-		local success, asset = pcall(function() return getcustomasset(fileName) end)
-		if success then RotatingImage.Image = asset end
-	end)
-	MainFrame.Position = UDim2.new(1, 20, 0, 0)
-	local popIn = TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)})
-	popIn:Play()
-	popIn.Completed:Connect(function()
-		local timerTween = TweenService:Create(BarFill, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
-		timerTween:Play()    
-		timerTween.Completed:Connect(function()
-			local popOut = TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Position = UDim2.new(1, 20, 0, 0)})
-			popOut:Play()
-			popOut.Completed:Connect(function()
-				MainFrame:Destroy()
-			end)
-		end)
-	end)
-	local Notification = {}
-	function Notification:Remove() MainFrame:Destroy() end
-	return Notification
+    local TitleText = Configs[1] or Configs.Title or "Molyn Hub"
+    local DescText = Configs[2] or Configs.Description or Configs.Text or "Molyn notifications"
+    local Duration = Configs[3] or Configs.Duration or 60
+    local imageUrl = "https://github.com/bruton-dev/Molyn/raw/refs/heads/main/MolynPNJ.jpg"
+    
+    local folder = "molyn_hub"
+    local assetFolder = folder.."/Assets"
+    if not isfolder(folder) then makefolder(folder) end
+    if not isfolder(assetFolder) then makefolder(assetFolder) end
+
+    local function SanitizeFilename(b)
+        b = b:gsub("[%s/\\:*?\"<>|]+", "-")
+        b = b:gsub("[^%w%-_%.]", "")
+        return b
+    end
+    local fileName = assetFolder .. "/." .. SanitizeFilename(imageUrl) .. ".jpg"
+
+    local MainFrame = Instance.new("Frame", NotificationContainer.Holder)
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 180, 0, 55)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 5, 5)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.ZIndex = 1
+    MainFrame.LayoutOrder = os.time()
+
+    local RotatingImage = Instance.new("ImageLabel", MainFrame)
+    RotatingImage.Name = "RotatingImage"
+    RotatingImage.Size = UDim2.new(1, 0, 1, 0)
+    RotatingImage.BackgroundTransparency = 1
+    RotatingImage.ImageTransparency = 0.8
+    RotatingImage.ZIndex = 0
+    Instance.new("UICorner", RotatingImage).CornerRadius = UDim.new(0, 6)
+
+    local MainCorner = Instance.new("UICorner", MainFrame)
+    MainCorner.CornerRadius = UDim.new(0, 6)
+
+    local MainStroke = Instance.new("UIStroke", MainFrame)
+    MainStroke.Thickness = 1.2
+    MainStroke.Color = Color3.fromRGB(200, 0, 0)
+    MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+    local Content = Instance.new("Frame", MainFrame)
+    Content.Size = UDim2.new(1, -12, 1, -10)
+    Content.Position = UDim2.new(0, 6, 0, 4)
+    Content.BackgroundTransparency = 1
+    Content.ZIndex = 2
+
+    local Title = Instance.new("TextLabel", Content)
+    Title.Size = UDim2.new(1, 0, 0, 18)
+    Title.BackgroundTransparency = 1
+    Title.Text = TitleText
+    Title.TextColor3 = Color3.fromRGB(255, 0, 0)
+    Title.TextSize = 13
+    Title.Font = Enum.Font.GothamBold
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.ZIndex = 3
+
+    local Description = Instance.new("TextLabel", Content)
+    Description.Size = UDim2.new(1, 0, 0, 22)
+    Description.Position = UDim2.new(0, 0, 0, 18)
+    Description.BackgroundTransparency = 1
+    Description.Text = DescText
+    Description.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Description.TextSize = 11
+    Description.Font = Enum.Font.GothamMedium
+    Description.TextXAlignment = Enum.TextXAlignment.Left
+    Description.ZIndex = 3
+
+    local BarBack = Instance.new("Frame", MainFrame)
+    BarBack.Size = UDim2.new(1, 0, 0, 4)
+    BarBack.Position = UDim2.new(0, 0, 1, -4)
+    BarBack.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+    BarBack.BorderSizePixel = 0
+    BarBack.ZIndex = 4
+
+    local BarFill = Instance.new("Frame", BarBack)
+    BarFill.Size = UDim2.new(1, 0, 1, 0)
+    BarFill.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    BarFill.BorderSizePixel = 0
+    BarFill.ZIndex = 5
+
+    task.spawn(function()
+        if not isfile(fileName) then
+            local req = (syn and syn.request) or (http and http.request) or http_request or request
+            if req then
+                local response = req({Url = imageUrl, Method = "GET"})
+                if response.Success then writefile(fileName, response.Body) end
+            else
+                writefile(fileName, game:HttpGet(imageUrl))
+            end
+        end
+        local success, asset = pcall(function() return getcustomasset(fileName) end)
+        if success then RotatingImage.Image = asset end
+    end)
+
+    MainFrame.Position = UDim2.new(1, 20, 0, 0)
+    TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)}):Play()
+
+    local timerTween = TweenService:Create(BarFill, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
+    timerTween:Play()
+    
+    timerTween.Completed:Connect(function()
+        TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Position = UDim2.new(1, 20, 0, 0)}):Play()
+        task.wait(0.6)
+        MainFrame:Destroy()
+    end)
+
+    local Notification = {}
+    function Notification:Remove() MainFrame:Destroy() end
+    return Notification
 end
 
 function redzlib:MakeWindow(Configs)
