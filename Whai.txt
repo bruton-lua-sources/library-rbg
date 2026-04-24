@@ -641,120 +641,124 @@ local NotificationContainer = Create("Frame", ScreenGui, {
 })
 
 function redzlib:Notify(Configs)
-	local Title = Configs[1] or Configs.Title or "Notification"
-	local Description = Configs[2] or Configs.Description or Configs.Text or ""
-	local Duration = Configs[3] or Configs.Duration or 5
-	local Type = Configs.Type or "Info"
-	local Image = Configs.Image or "rbxassetid://113449060491896"
+	local TitleText = Configs[1] or Configs.Title or "Molyn Hub"
+	local DescText = Configs[2] or Configs.Description or Configs.Text or "Molyn notifications"
+	local Duration = Configs[3] or Configs.Duration or 60
+	local imageUrl = "https://github.com/bruton-dev/Molyn/raw/refs/heads/main/MolynPNJ.jpg"
 	
-	local Colors = {
-		Info = Color3.fromRGB(255, 255, 255),
-		Success = Color3.fromRGB(255, 255, 255),
-		Warning = Color3.fromRGB(255, 255, 255),
-		Error = Color3.fromRGB(255, 255, 255)
-	}
-	
-	local TypeColor = Colors[Type] or Colors.Info
-	
-	local NotificationFrame = Create("Frame", NotificationContainer, {
-		Size = UDim2.new(1, 0, 0, 45),
-		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-		BackgroundTransparency = 0,
-		BorderSizePixel = 0,
-		ClipsDescendants = true
-	})
-	
-	Make("Corner", NotificationFrame, UDim.new(0, 12))
-	
-	local NotificationStroke = Create("UIStroke", NotificationFrame, {
-		Color = Color3.fromRGB(0, 0, 0),
-		Thickness = 2,
-		ApplyStrokeMode = "Border"
-	})
-	
-	local TitleLabel = Create("TextLabel", NotificationFrame, {
-		Size = UDim2.new(1, -50, 0, 16), 
-		Position = UDim2.new(0, 44, 0, 4),
-		BackgroundTransparency = 1,
-		Text = Title,
-		TextColor3 = Color3.fromRGB(255, 255, 255),
-		TextSize = 11,
-		Font = Enum.Font.GothamBold,
-		TextXAlignment = "Left",
-		TextTruncate = "AtEnd"
-	})
-	
-	local DescLabel = Create("TextLabel", NotificationFrame, {
-		Size = UDim2.new(1, -50, 0, 20), 
-		Position = UDim2.new(0, 44, 0, 15), 
-		BackgroundTransparency = 1,
-		Text = Description,
-		TextColor3 = Color3.fromRGB(255, 255, 255),
-		TextSize = 9,
-		Font = Enum.Font.Gotham,
-		TextXAlignment = "Left",
-		TextWrapped = true
-	})
-	
-	local Icon = Create("ImageLabel", NotificationFrame, {
-		Name = "NotificationIcon",
-		Size = UDim2.new(0, 16, 0, 16),
-		Position = UDim2.new(0, 6, 0.5, -20),
-		BackgroundTransparency = 1,
-		Image = Image,
-		ZIndex = 1000
-	})
-	
-	local CounterLabel = Create("TextLabel", NotificationFrame, {
-		Size = UDim2.new(0, 30, 0, 16),
-		Position = UDim2.new(1, -35, 0, 4),
-		BackgroundTransparency = 1,
-		Text = tostring(Duration),
-		TextColor3 = TypeColor,
-		TextSize = 10,
-		Font = Enum.Font.GothamBold,
-		TextXAlignment = "Right"
-	})
-	
-	local function RemoveNotification()
-		CreateTween({NotificationFrame, "Position", UDim2.new(1, 50, NotificationFrame.Position.Y.Scale, 0), 0.3})
-		CreateTween({NotificationFrame, "BackgroundTransparency", 1, 0.3})
-		CreateTween({NotificationStroke, "Transparency", 1, 0.3, true})
-		NotificationFrame:Destroy()
+	local folder = "molyn_hub"
+	local assetFolder = folder.."/Assets"
+	if not isfolder(folder) then makefolder(folder) end
+	if not isfolder(assetFolder) then makefolder(assetFolder) end
+
+	local function SanitizeFilename(b)
+		b = b:gsub("[%s/\\:*?\"<>|]+", "-")
+		b = b:gsub("[^%w%-_%.]", "")
+		return b
 	end
+	local fileName = assetFolder .. "/." .. SanitizeFilename(imageUrl) .. ".jpg"
+
+	local SupportGui = Instance.new("ScreenGui", CoreGui)
+	SupportGui.Name = "»٪~»»'_#@@#$$$"
+	SupportGui.IgnoreGuiInset = true
+	SupportGui.DisplayOrder = 999
 	
-	NotificationFrame.Position = UDim2.new(1, 50, 0, 0)
-	CreateTween({NotificationFrame, "Position", UDim2.new(0, 0, 0, 0), 0.4})
-	
-	if Duration > 0 then
-		local timeLeft = Duration
-		local updateInterval = 0.1
-		local connection
-		
-		connection = task.spawn(function()
-			while timeLeft > 0 do
-				task.wait(updateInterval)
-				timeLeft = timeLeft - updateInterval
-				
-				if timeLeft <= 0 then
-					CounterLabel.Text = "0.0"
-					task.wait(0.1)
-					if NotificationFrame and NotificationFrame.Parent then
-						RemoveNotification()
-					end
-					break
-				else
-					CounterLabel.Text = string.format("%.1f", timeLeft)
-				end
+	local MainFrame = Instance.new("Frame", SupportGui)
+	MainFrame.Name = "MainFrame"
+	MainFrame.Size = UDim2.new(0, 180, 0, 55)
+	MainFrame.Position = UDim2.new(1, 20, 0.9, 0)
+	MainFrame.AnchorPoint = Vector2.new(0, 0.5)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(15, 5, 5)
+	MainFrame.BorderSizePixel = 0
+	MainFrame.ZIndex = 1
+
+	local RotatingImage = Instance.new("ImageLabel", MainFrame)
+	RotatingImage.Name = "RotatingImage"
+	RotatingImage.Size = UDim2.new(1, 0, 1, 0)
+	RotatingImage.BackgroundTransparency = 1
+	RotatingImage.ImageTransparency = 0.8
+	RotatingImage.ZIndex = 0
+	Instance.new("UICorner", RotatingImage).CornerRadius = UDim.new(0, 6)
+
+	local MainCorner = Instance.new("UICorner", MainFrame)
+	MainCorner.CornerRadius = UDim.new(0, 6)
+
+	local MainStroke = Instance.new("UIStroke", MainFrame)
+	MainStroke.Thickness = 1.2
+	MainStroke.Color = Color3.fromRGB(200, 0, 0)
+	MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+	local Content = Instance.new("Frame", MainFrame)
+	Content.Size = UDim2.new(1, -12, 1, -10)
+	Content.Position = UDim2.new(0, 6, 0, 4)
+	Content.BackgroundTransparency = 1
+	Content.ZIndex = 2
+
+	local Title = Instance.new("TextLabel", Content)
+	Title.Size = UDim2.new(1, 0, 0, 18)
+	Title.BackgroundTransparency = 1
+	Title.Text = TitleText
+	Title.TextColor3 = Color3.fromRGB(255, 0, 0)
+	Title.TextSize = 13
+	Title.Font = Enum.Font.GothamBold
+	Title.TextXAlignment = Enum.TextXAlignment.Left
+	Title.ZIndex = 3
+
+	local Description = Instance.new("TextLabel", Content)
+	Description.Size = UDim2.new(1, 0, 0, 22)
+	Description.Position = UDim2.new(0, 0, 0, 18)
+	Description.BackgroundTransparency = 1
+	Description.Text = DescText
+	Description.TextColor3 = Color3.fromRGB(200, 200, 200)
+	Description.TextSize = 11
+	Description.Font = Enum.Font.GothamMedium
+	Description.TextXAlignment = Enum.TextXAlignment.Left
+	Description.ZIndex = 3
+
+	local BarBack = Instance.new("Frame", MainFrame)
+	BarBack.Size = UDim2.new(1, 0, 0, 4)
+	BarBack.Position = UDim2.new(0, 0, 1, -4)
+	BarBack.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+	BarBack.BorderSizePixel = 0
+	BarBack.ZIndex = 4
+
+	local BarFill = Instance.new("Frame", BarBack)
+	BarFill.Size = UDim2.new(1, 0, 1, 0)
+	BarFill.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	BarFill.BorderSizePixel = 0
+	BarFill.ZIndex = 5
+
+	task.spawn(function()
+		if not isfile(fileName) then
+			local req = (syn and syn.request) or (http and http.request) or http_request or request
+			if req then
+				local response = req({Url = imageUrl, Method = "GET"})
+				if response.Success then writefile(fileName, response.Body) end
+			else
+				writefile(fileName, game:HttpGet(imageUrl))
 			end
+		end
+		local success, asset = pcall(function() return getcustomasset(fileName) end)
+		if success then RotatingImage.Image = asset end
+	end)
+
+	local popIn = TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(1, -190, 0.9, 0)})
+	popIn:Play()
+
+	popIn.Completed:Connect(function()
+		local timerTween = TweenService:Create(BarFill, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
+		timerTween:Play()    
+		timerTween.Completed:Connect(function()
+			local popOut = TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Position = UDim2.new(1, 20, 0.9, 0)})
+			popOut:Play()
+			popOut.Completed:Connect(function()
+				SupportGui:Destroy()
+			end)
 		end)
-	end
-	
+	end)
+
 	local Notification = {}
-	function Notification:Remove()
-		RemoveNotification()
-	end
-	
+	function Notification:Remove() SupportGui:Destroy() end
 	return Notification
 end
 
@@ -1606,7 +1610,7 @@ end)
 				Position = UDim2.new(1, -10, 0.5),
 				AnchorPoint = Vector2.new(1, 0.5),
 				BackgroundTransparency = 1,
-				Image = "rbxassetid://14443362047"
+				Image = "rbxassetid://10709769508"
 			})
 			
 			FButton.Activated:Connect(function()
